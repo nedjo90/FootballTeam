@@ -12,3 +12,4 @@
 /Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.pdb
 /Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.genruntimeconfig.cache
 /Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/ref/FootballTeam.dll
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.sourcelink.json

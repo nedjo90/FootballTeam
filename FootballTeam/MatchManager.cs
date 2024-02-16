@@ -18,7 +18,7 @@ public static class MatchManager
     {
         List<Player> listOfTeam = new List<Player>();
         List<Player> listOfPlayerPlayable = CreateListOfPlayerPlayable(club);
-        while (listOfTeam.Count <= 11 && listOfTeam.Count <= listOfPlayerPlayable.Count)
+        while (listOfTeam.Count < 11 && listOfTeam.Count <= listOfPlayerPlayable.Count)
         {
             Player selectedPlayer = listOfPlayerPlayable[_random.Next(listOfPlayerPlayable.Count)];
             if (!listOfTeam.Contains(selectedPlayer))

@@ -5,9 +5,11 @@ public class Match
     public Club Home{ get; private set; }
     public Club Visitor { get; private set; }
     public List<Player> ListOfPlayingTeamHome { get; private set; }
+    public List<Player> ListOfPlayingTeamHomeStart { get; private set; }
     public List<Player> ListOfReserveHome { get; private set; }
     public List<Player> ListOfPlayerOutHome { get; private set; }
     public List<Player> ListOfPlayingTeamVisitor { get; private set; }
+    public List<Player> ListOfPlayingTeamVisitorStart { get; private set; }
     public List<Player> ListOfReserveVisitor { get; private set; }
     public List<Player> ListOfPlayerOutVisitor { get; private set; }
 
@@ -30,7 +32,17 @@ public class Match
         foreach (Player player in Visitor.ListOfPlayers)
             player.MatchInClub.Add(this);
         ListOfPlayingTeamHome = MatchManager.GenerateRandomTeamForGame(home);
+        ListOfPlayingTeamHomeStart = new List<Player>();
+        ListOfPlayingTeamHome.ForEach((player) =>
+        {
+            ListOfPlayingTeamHomeStart.Add(player);
+        });
         ListOfPlayingTeamVisitor = MatchManager.GenerateRandomTeamForGame(visitor);
+        ListOfPlayingTeamVisitorStart = new List<Player>();
+        ListOfPlayingTeamVisitor.ForEach((player) =>
+        {
+            ListOfPlayingTeamVisitorStart.Add(player);
+        });
         ListOfReserveHome = MatchManager.CreateListOfReserve(home, ListOfPlayingTeamHome);
         ListOfReserveVisitor = MatchManager.CreateListOfReserve(visitor, ListOfPlayingTeamVisitor);
         ListOfPlayerOutHome = new List<Player>();
@@ -57,19 +69,19 @@ public class Match
                 GiveRandomCardRandomPlayer(ListOfPlayingTeamHome, time);
             if (destiny <= probabilityOfCardVisitor)
                 GiveRandomCardRandomPlayer(ListOfPlayingTeamVisitor, time);
-            if (destiny <= probabilityOfGoalHome * 1.2 && destiny % 2 == 0)
+            if (destiny <= probabilityOfGoalHome * 1.2 && destiny % 3 == 0)
                 ListOfHomeScorer.Add(MatchManager.GenerateRandomScorerFromTeam(ListOfPlayingTeamHome));
-            if (destiny <= probabilityOfGoalVisitor && destiny % 2 != 0)
+            if (destiny <= probabilityOfGoalVisitor && destiny % 3 != 0)
                 ListOfVisitorScorer.Add(MatchManager.GenerateRandomScorerFromTeam(ListOfPlayingTeamVisitor));
-            if ((probabilityOfCardHome + probabilityOfGoalHome) % _random.Next(1,10) == 0)
+            if ((probabilityOfCardHome + probabilityOfGoalHome) % 5 == 0)
                 ListOfInjuriedHomePlayer.Add(GiveRandomInjuryDaysRandomPlayer(ListOfPlayingTeamHome));
-            if ((probabilityOfCardVisitor + probabilityOfGoalVisitor) % _random.Next(1, 10) == 0)
+            if ((probabilityOfCardVisitor + probabilityOfGoalVisitor) % 5 == 0)
                 ListOfInjuriedVisitorPlayer.Add(GiveRandomInjuryDaysRandomPlayer(ListOfPlayingTeamVisitor));
-            destiny = destiny * 100 / 120;
+           /* destiny = destiny * 2000 / 100;
             if(destiny <= probabilityOfCardHome)
                 MakeChangeInPlayingTeam(ListOfPlayingTeamHome);
             if(destiny <= probabilityOfCardVisitor)
-                MakeChangeInPlayingTeam(ListOfPlayingTeamVisitor);
+                MakeChangeInPlayingTeam(ListOfPlayingTeamVisitor);*/
         }
     }
 
@@ -88,7 +100,6 @@ public class Match
 
         if (isRedCard)
         {
-            team.Remove(randomPlayer);
             randomPlayer.DaysOfSuspension = 3;
             ListOfRedCard.Add(randomPlayer);
         }
@@ -99,26 +110,31 @@ public class Match
         List<Player> listReserve;
         List<Player> listActuallyPlaying;
         List<Player> listOut;
+        List<Player> listInjured;
         if (playerOut.Club.Equals(Home.Name))
         {
             listReserve = ListOfReserveHome;
             listActuallyPlaying = ListOfPlayingTeamHome;
-            listOut = ListOfReserveHome;
+            listOut = ListOfPlayerOutHome;
+            listInjured = ListOfInjuriedHomePlayer;
         }
         else
         {
             listReserve = ListOfReserveVisitor;
             listActuallyPlaying = ListOfPlayingTeamVisitor;
-            listOut = ListOfReserveVisitor;
+            listOut = ListOfPlayerOutVisitor;
+            listInjured = ListOfInjuriedVisitorPlayer;
         }
         listActuallyPlaying.Remove(playerOut);
         listOut.Add(playerOut);
-        if (listReserve.Count != 0)
+        if (listOut.Count < 5  && listReserve.Count > 0)
         {
             Player playerIn = listReserve[_random.Next(listReserve.Count())];
             listActuallyPlaying.Add(playerIn);
             listReserve.Remove(playerIn);
         }
+        else if (listInjured.Contains(playerOut))
+            listActuallyPlaying.Remove(playerOut);
     }
     
     public void MakeChangeInPlayingTeam(List<Player> listActuallyPlaying)
@@ -140,7 +156,7 @@ public class Match
         }
         listActuallyPlaying.Remove(playerOut);
         listOut.Add(playerOut);
-        if (listReserve.Count != 0)
+        if (listOut.Count < 5 && listReserve.Count > 0)
         {
             Player playerIn = listReserve[_random.Next(listReserve.Count())];
             listActuallyPlaying.Add(playerIn);
@@ -151,13 +167,13 @@ public class Match
     {
         Player injuredPlayer =  team[_random.Next(team.Count)];
         injuredPlayer.DaysOfInjury = _random.Next(10);
-        MakeChangeInPlayingTeam(injuredPlayer);
+        //MakeChangeInPlayingTeam(injuredPlayer);
         return injuredPlayer;
     }
-
-    public string Scorer()
+    
+    public string ScorerToString()
     {
-        string toReturn = "";
+        string toReturn = "Scorer:\n";
         int i = 0;
         int width = 30;
         while(i < ListOfHomeScorer.Count || i < ListOfVisitorScorer.Count)
@@ -191,7 +207,68 @@ public class Match
 
         return toReturn;
     }
-    public string Score()
+    
+    
+    public string LastPlayingTeamToString()
+    {
+        string toReturn = "On the ground:\n";
+        int i = 0;
+        int width = 30;
+        while(i < ListOfPlayingTeamHome.Count || i < ListOfPlayingTeamVisitor.Count)
+        {
+            if (ListOfPlayingTeamHome.Count > i)
+            {
+                toReturn += ListOfPlayingTeamHome[i].Name;
+                if (ListOfHomeScorer.Contains(ListOfPlayingTeamHome[i]))
+                    ListOfHomeScorer.ForEach(scorer =>
+                    {
+                        if (scorer == ListOfPlayingTeamHome[i])
+                            toReturn += " ⚽️";
+                    });
+                if (!ListOfPlayingTeamHomeStart.Contains(ListOfPlayingTeamHome[i]))
+                    toReturn += " ♻️️";
+                if (ListOfYellowCard.Contains(ListOfPlayingTeamHome[i]))
+                    ListOfYellowCard.ForEach(player =>
+                    {
+                        if (player.Equals(ListOfPlayingTeamHome[i]))
+                            toReturn += " 📒";
+                    });
+                if (ListOfRedCard.Contains(ListOfPlayingTeamHome[i]))
+                    toReturn += " 📕";
+                for (int j = ListOfPlayingTeamHome[i].Name.Length; j < width; j++)
+                {
+                    toReturn += " ";
+                }
+            }
+            else
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    toReturn += " ";
+                }
+            }
+            if (ListOfPlayingTeamVisitor.Count > i)
+            {
+                for (int j = ListOfPlayingTeamVisitor[i].Name.Length - 10; j < width; j++)
+                {
+                    toReturn += " ";
+                }
+                toReturn += ListOfPlayingTeamVisitor[i].Name;
+                if (ListOfVisitorScorer.Contains(ListOfPlayingTeamVisitor[i]))
+                    ListOfVisitorScorer.ForEach(scorer =>
+                    {
+                        if (scorer == ListOfPlayingTeamVisitor[i])
+                            toReturn += " ⚽️";
+                    });
+            }
+            toReturn += "\n";
+            i++;
+        }
+
+        return toReturn;
+    }
+    
+    public string ScoreToString()
     {
         string toReturn = "";
         int width = 30;
@@ -207,7 +284,13 @@ public class Match
     
     public void Display()
     {
-        Console.WriteLine(Score());
-        Console.WriteLine(Scorer());
+        Console.WriteLine(ScoreToString());
+        Console.WriteLine(LastPlayingTeamToString());
+        Console.WriteLine("--------");
+        Console.WriteLine(ListOfPlayingTeamHomeStart.Count);
+        foreach (var VARIABLE in ListOfRedCard)
+        {
+            Console.WriteLine(VARIABLE.Name);
+        }
     }
 }
