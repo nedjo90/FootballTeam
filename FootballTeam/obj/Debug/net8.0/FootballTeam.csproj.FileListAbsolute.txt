@@ -1,0 +1,14 @@
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/bin/Debug/net8.0/FootballTeam
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/bin/Debug/net8.0/FootballTeam.deps.json
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/bin/Debug/net8.0/FootballTeam.runtimeconfig.json
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/bin/Debug/net8.0/FootballTeam.dll
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/bin/Debug/net8.0/FootballTeam.pdb
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.GeneratedMSBuildEditorConfig.editorconfig
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.AssemblyInfoInputs.cache
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.AssemblyInfo.cs
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.csproj.CoreCompileInputs.cache
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.dll
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/refint/FootballTeam.dll
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.pdb
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/FootballTeam.genruntimeconfig.cache
+/Users/necatihan/RiderProjects/FootballTeam/FootballTeam/obj/Debug/net8.0/ref/FootballTeam.dll
