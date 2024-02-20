@@ -7,6 +7,13 @@ public static class ColorManager
         Console.BackgroundColor = ConsoleColor.Black;
         Console.ForegroundColor = ConsoleColor.Red;
     }
+    public static void BackBlackForeDarkMagenta()
+    {
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+    }
+    
+    
 
     public static void BackBlackForeBlue()
     {

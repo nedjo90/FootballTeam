@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace FootballTeam;
 
 public static class DataManager
@@ -5,11 +7,13 @@ public static class DataManager
     public static  List<Player> ListOfPlayer = new List<Player>();
     public static List<Club> ListOfClub = new List<Club>();
     public static string Path = "../../../../player.csv";
+    public static DateTime Date { get; set; }
+    
     
     public static void Initializer()
     {
         string[] importCsv = File.ReadAllLines(Path);
-        
+        Date = DateTime.Now;
         foreach (string data in importCsv)
         {
             Player newPlayer = new Player();
@@ -18,11 +22,30 @@ public static class DataManager
              newPlayer.Nationality = playerDataSplit[1];
              newPlayer.NationalPosition = playerDataSplit[2];
              newPlayer.NationalKit = ConvertToDouble(playerDataSplit[3]);
-             newPlayer.Club = playerDataSplit[4];
+             newPlayer.ListOfClub = new List<Club>();
+             if (ClubExist(playerDataSplit[4]))
+             {
+                Club club =  SearchClubByName(playerDataSplit[4]);
+                newPlayer.ListOfClub.Add(club); 
+                club.ListOfPlayers.Add(newPlayer);
+             }
+            else
+            {
+                Club newClub = new Club(playerDataSplit[4]);
+                ListOfClub.Add(newClub);
+                newPlayer.ListOfClub.Add(newClub);
+                newClub.ListOfPlayers.Add(newPlayer);
+            }
              newPlayer.ClubPosition = playerDataSplit[5];
              newPlayer.ClubKit = ConvertToDouble(playerDataSplit[6]);
              newPlayer.ClubJoining = playerDataSplit[7];
-             newPlayer.ContractExpiry = ConvertToDateTime(playerDataSplit[8]);
+             if (DateTime.TryParse(playerDataSplit[8], CultureInfo.InvariantCulture,
+                     out DateTime result))
+                 newPlayer.ContractExpiry = result;
+             else
+             {
+                 newPlayer.ContractExpiry = DateTime.Now;
+             }
              newPlayer.Rating = ConvertToInt(playerDataSplit[9]);
              newPlayer.Height = ConvertToInt(playerDataSplit[10]);
              newPlayer.Weight = ConvertToInt(playerDataSplit[11]);
@@ -67,55 +90,31 @@ public static class DataManager
              newPlayer.GkKicking = ConvertToInt(playerDataSplit[50]);
              newPlayer.GkHandling = ConvertToInt(playerDataSplit[51]);
              newPlayer.GkReflexes = ConvertToInt(playerDataSplit[52]);
-             newPlayer.MatchInClub = new List<Match>();
              newPlayer.DaysOfSuspension = 0;
              newPlayer.DaysOfInjury = 0;
              ListOfPlayer.Add(newPlayer);
-             AddToClub(newPlayer);
+             newPlayer.ListOfMatch = new List<Match>();
         }
     }
 
-    public static void AddToClub(Player? player)
-    {
-        if (player?.Club == null)
-            return;
-        if (IsInListOfClub(player.Club))
-        {
-            foreach (Club club in ListOfClub)
-            {
-                if (player.Club == club.Name)
-                {
-                    club.ListOfPlayers.Add(player);
-                    return;
-                }
-            }
-        }
-        Club newClub = new Club(player.Club);
-        newClub.ListOfPlayers.Add(player);
-        ListOfClub.Add(newClub);
-    }
 
-    public static bool IsInListOfClub(string nameOfClub)
+    public static Club? SearchClubByName(string name)
     {
         foreach (Club club in ListOfClub)
         {
-            if (club.Name == nameOfClub)
-                return true;
+            if (club.Name.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
+                return club;
         }
+        return null;
+    }
 
-        return false;
-    }
-    public static void DisplayPlayerMoreThan30()
+    public static bool ClubExist(string name)
     {
-        int index = 0;
-        foreach (Player player in ListOfPlayer)
-        {
-            Console.WriteLine(player.Name);
-            index++;
-            if (index > 10)
-                break;
-        }
+        if (SearchClubByName(name) == null)
+            return false;
+        return true;
     }
+    
 
     public static int ConvertToInt(string valueToConvert)
     {
@@ -137,29 +136,11 @@ public static class DataManager
         return null;
     }
 
-    public static void SearchByPlayerName(string? name)
-    {
-            foreach (Player player in ListOfPlayer)
-            {
-                if (player.Name.Contains(name))
-                {
-                    player.Display();
-                    Console.WriteLine("*****************************************************************************************");
-                }
-            }
-    }
-    
-    public static void SearchPlayersByClubName(string? name)
-    {
-        foreach (Club club in ListOfClub)
-        {
-            if (club.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
-                club.Display();
-        }
-    }
     
     public static int RatingMeanOfPlayerList(List<Player> listOfPlayer)
     {
+        if (listOfPlayer.Count == 0)
+            return 0;
         int sum = 0;
         foreach (Player player in listOfPlayer)
             sum += player.Rating;
@@ -167,6 +148,8 @@ public static class DataManager
     }
     public static int AgressivityMeanOfPlayerList(List<Player> listOfPlayer)
     {
+        if (listOfPlayer.Count == 0)
+            return 0;
         int sum = 0;
         foreach (Player player in listOfPlayer)
             sum += player.Aggression;
@@ -178,6 +161,43 @@ public static class DataManager
         Random random = new Random();
         Club randomClub = ListOfClub[random.Next(ListOfClub.Count)];
         return randomClub;
+    }
+    public static Club RandomClub(List<Club> listOfClub)
+    {
+        Random random = new Random();
+        Club randomClub = listOfClub[random.Next(listOfClub.Count)];
+        return randomClub;
+    }
+
+    public static int RandomNumber(int max)
+    {
+        Random random = new Random();
+        return random.Next(max);
+    }
+    public static int RandomNumber(int min, int max)
+    {
+        Random random = new Random();
+        return random.Next(min, max);
+    }
+
+    public static Player RandomPlayer(List<Player> listOfPlayer)
+    {
+        int randomPlayerIndex = RandomNumber(listOfPlayer.Count);
+        return listOfPlayer[randomPlayerIndex];
+    }
+
+    public static void DecrementDaysOfInjuryAndSuspension(Club club)
+    {
+        foreach (Player player in club.ListOfPlayers)
+        {
+            if (player.DaysOfInjury > 0)
+                player.DaysOfInjury--;
+            if (player.DaysOfSuspension > 0)
+                player.DaysOfSuspension--;
+            {
+                
+            }
+        }
     }
 }
 

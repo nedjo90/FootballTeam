@@ -6,11 +6,11 @@ public class Player
     public string Nationality {get; set;}
     public string NationalPosition {get; set;}
     public double NationalKit {get; set;}
-    public string Club {get; set;}
+    public List<Club> ListOfClub {get; set;}
     public string ClubPosition {get; set;}
     public double ClubKit {get; set;}
     public string ClubJoining {get; set;}
-    public DateTime? ContractExpiry {get; set;}
+    public DateTime ContractExpiry {get; set;}
     public int Rating {get; set;}
     public int Height {get; set;}
     public int Weight {get; set;}
@@ -55,9 +55,10 @@ public class Player
     public int GkKicking {get; set;}
     public int GkHandling {get; set;}
     public int GkReflexes {get; set;}
-    public List<Match> MatchInClub { get; set; }
     public int DaysOfSuspension { get;  set; }
     public int DaysOfInjury { get; set; }
+    
+    public List<Match> ListOfMatch { get; set; }
     
     public void Display()
     {
@@ -66,10 +67,20 @@ public class Player
             $"<{Name} :" +
             $"{Nationality}\t" + 
             $"{NationalPosition}\t" +
-            $"{Club}\t" + 
+            $"{ListOfClub[ListOfClub.Count - 1]}\t" + 
             $"{ClubPosition}\t" +
             $"{Age} years>" 
             );
         Console.ResetColor();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null || !GetType().Equals(obj.GetType()))
+            return false;
+        Player compared = (Player)obj;
+        return (Name.Equals(compared.Name) && BirthDate.Equals(compared.BirthDate));
     }
 }
